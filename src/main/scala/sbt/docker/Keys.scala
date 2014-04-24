@@ -20,6 +20,10 @@ object Keys {
   val context = TaskKey[File]("context", "The context of the docker build.")
 
   val password = SettingKey[String]("password", "docker.io password")
+
+  val tag = SettingKey[String]("tag", "The full tag of the image. Constructed from the registry, name , and version. You should not need to override, but access to the value is provided for convenience.")
+
+  val registry = SettingKey[String]("registry", "The docker registry to use for tag, push, and pull. Defaults to username.")
 }
 
 // vim: set ts=4 sw=4:
