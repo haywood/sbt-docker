@@ -30,7 +30,6 @@ object SbtDockerPlugin extends Plugin {
     password in Docker := Option(sys.props("docker.password")).getOrElse(""),
     context in Docker <<= sbt.Keys.baseDirectory,
     build in Docker <<= (repo in Docker, tag in Docker, context in Docker, streams) map { (repo, tag, context, streams) =>
-      val regex = """Successfully built (\w+)""".r
       s"docker build -q --rm -t $repo:$tag $context" ! streams.log
     },
     login in Docker <<= (username in Docker, password in Docker, email in Docker, streams) map { (u, p, e, streams) =>
