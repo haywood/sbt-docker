@@ -11,7 +11,7 @@ object SbtDockerPlugin extends Plugin {
     username in Docker := Option(sys.props("docker.username")).getOrElse(""),
     email in Docker := Option(sys.props("docker.email")).getOrElse(""),
     password in Docker := Option(sys.props("docker.password")).getOrElse(""),
-    context in Docker <<= sbt.Keys.baseDirectory,
+    context in Docker <<= sbt.Keys.baseDirectory.map(identity) ,
     build in Docker <<= (name in Docker, version in Docker, context in Docker, streams) map { (name, version, context, streams) =>
       s"docker build -q --rm -t $name:$version $context" ! streams.log
     },

@@ -17,7 +17,7 @@ object Keys {
 
   val email = SettingKey[String]("email", "docker.io email")
 
-  val context = SettingKey[File]("context", "The context of the docker build.")
+  val context = TaskKey[File]("context", "The context of the docker build.")
 
   val password = SettingKey[String]("password", "docker.io password")
 }
