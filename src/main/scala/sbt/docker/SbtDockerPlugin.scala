@@ -20,15 +20,18 @@ object SbtDockerPlugin extends Plugin {
 
   val email = SettingKey[String]("email", "docker.io email")
 
+  val context = SettingKey[File]("context", "The context of the docker build.")
+
   val password = SettingKey[String]("password", "docker.io password")
 
   override lazy val settings = Seq(
-    username in Docker := sys.props("docker.username"),
-    email in Docker := sys.props("docker.email"),
-    password in Docker := sys.props("docker.password"),
-    build in Docker <<= (repo in Docker, tag in Docker, streams) map { (repo, tag, streams) =>
+    username in Docker := Option(sys.props("docker.username")).getOrElse(""),
+    email in Docker := Option(sys.props("docker.email")).getOrElse(""),
+    password in Docker := Option(sys.props("docker.password")).getOrElse(""),
+    context in Docker <<= sbt.Keys.baseDirectory,
+    build in Docker <<= (repo in Docker, tag in Docker, context in Docker, streams) map { (repo, tag, context, streams) =>
       val regex = """Successfully built (\w+)""".r
-      s"docker build -t $repo:$tag ." ! streams.log
+      s"docker build -q --rm -t $repo:$tag $context" ! streams.log
     },
     login in Docker <<= (username in Docker, password in Docker, email in Docker, streams) map { (u, p, e, streams) =>
       s"docker login -u $u -p $p -e $e" ! streams.log
