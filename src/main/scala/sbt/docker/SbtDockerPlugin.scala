@@ -1,10 +1,12 @@
 package sbt.docker
 
 import sbt._
+import sbt.Keys.name
+import sbt.Keys.version
 import sbt.Keys.streams
 
 object SbtDockerPlugin extends Plugin {
-  val Docker = config("docker")
+  val Docker = config("docker") extend Compile
 
   val build = TaskKey[Unit]("build", "Build a docker image.")
 
@@ -12,9 +14,7 @@ object SbtDockerPlugin extends Plugin {
 
   val push = TaskKey[Unit]("push", "Push the docker image.")
 
-  val repo = SettingKey[String]("repo", "The docker repo to push to.")
-
-  val tag = SettingKey[String]("tag", "The tag to give the image.")
+  val pull = TaskKey[Unit]("pull", "Pull the docker image.")
 
   val username = SettingKey[String]("username", "docker.io username")
 
@@ -29,16 +29,18 @@ object SbtDockerPlugin extends Plugin {
     email in Docker := Option(sys.props("docker.email")).getOrElse(""),
     password in Docker := Option(sys.props("docker.password")).getOrElse(""),
     context in Docker <<= sbt.Keys.baseDirectory,
-    build in Docker <<= (repo in Docker, tag in Docker, context in Docker, streams) map { (repo, tag, context, streams) =>
-      s"docker build -q --rm -t $repo:$tag $context" ! streams.log
+    build in Docker <<= (name in Docker, version in Docker, context in Docker, streams) map { (name, version, context, streams) =>
+      s"docker build -q --rm -t $name:$version $context" ! streams.log
     },
     login in Docker <<= (username in Docker, password in Docker, email in Docker, streams) map { (u, p, e, streams) =>
       s"docker login -u $u -p $p -e $e" ! streams.log
     },
-    push in Docker <<= (build in Docker, login in Docker, repo in Docker, tag in Docker, streams) map { (image, _, repo, tag, streams) =>
-      s"docker push $repo:$tag" ! streams.log
+    push in Docker <<= (build in Docker, login in Docker, name in Docker, version in Docker, streams) map { (image, _, name, version, streams) =>
+      s"docker push $name:$version" ! streams.log
     },
-    tag in Docker <<= sbt.Keys.version
+    pull in Docker <<= (name, version, streams) map { (name, version, streams) =>
+      s"docker pull $name:$version" ! streams.log
+    }
   )
 }
 
