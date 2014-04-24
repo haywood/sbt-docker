@@ -21,7 +21,7 @@ object SbtDockerPlugin extends Plugin {
     push in Docker <<= (build in Docker, login in Docker, name in Docker, version in Docker, streams) map { (image, _, name, version, streams) =>
       s"docker push $name:$version" ! streams.log
     },
-    pull in Docker <<= (name, version, streams) map { (name, version, streams) =>
+    pull in Docker <<= (name in Docker, version in Docker, login in Docker, streams) map { (name, version, _, streams) =>
       s"docker pull $name:$version" ! streams.log
     }
   )

@@ -1,5 +1,7 @@
 package sbt.docker
 
+import sbt._
+
 object Keys {
   val Docker = config("docker") extend Compile
 
