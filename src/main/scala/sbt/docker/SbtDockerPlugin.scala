@@ -9,11 +9,13 @@ import sbt.Keys.baseDirectory
 
 object SbtDockerPlugin extends Plugin {
   val dockerSettings = Seq(
-    username in Docker := Option(sys.props("docker.username")).getOrElse(""),
-    email in Docker := Option(sys.props("docker.email")).getOrElse(""),
-    password in Docker := Option(sys.props("docker.password")).getOrElse(""),
+    username in Docker := sys.props.getOrElse("docker.username", ""),
+    email in Docker := sys.props.getOrElse("docker.email", ""),
+    password in Docker := sys.props.getOrElse("docker.password", ""),
     context in Docker <<= baseDirectory.map(identity),
     registry in Docker <<= (username in Docker)(identity),
+    runArgs := Nil,
+    containerArgs := Nil,
     tag in Docker <<= (registry in Docker, name in Docker, version in Docker) { (registry, name, version) =>
       val base = s"$name:$version"
       if (registry.nonEmpty) {
@@ -41,6 +43,9 @@ object SbtDockerPlugin extends Plugin {
         throw new IllegalStateException("must specify a registry to use pull")
       }
       s"docker pull $tag" ! streams.log
+    },
+    runContainer in Docker <<= (tag in Docker, runArgs in Docker, containerArgs in Docker, streams) map { (tag, runArgs, containerArgs, streams) =>
+      s"docker run " + runArgs.mkString(" ") + s" $tag " + containerArgs.mkString(" ") ! streams.log
     }
   )
 }

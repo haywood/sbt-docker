@@ -3,27 +3,39 @@ package sbt.docker
 import sbt._
 
 object Keys {
+/* Configs */
+
   val Docker = config("docker") extend Compile
 
-  val build = TaskKey[Unit]("build", "Build a docker image.")
+/* Settings */
 
-  val login = TaskKey[Unit]("login", "Login into the docker index.")
+  val username = settingKey[String]("docker.io username")
 
-  val push = TaskKey[Unit]("push", "Push the docker image.")
+  val email = settingKey[String]("docker.io email")
 
-  val pull = TaskKey[Unit]("pull", "Pull the docker image.")
+  val password = settingKey[String]("docker.io password")
 
-  val username = SettingKey[String]("username", "docker.io username")
+  val tag = settingKey[String]("The full tag of the image. Constructed from the registry, name , and version. You should not need to override, but access to the value is provided for convenience.")
 
-  val email = SettingKey[String]("email", "docker.io email")
+  val registry = settingKey[String]("The docker registry to use for tag, push, and pull. Defaults to username.")
 
-  val context = TaskKey[File]("context", "The context of the docker build.")
+  val runArgs = settingKey[Seq[String]]("The arguments to the docker run command.")
 
-  val password = SettingKey[String]("password", "docker.io password")
+  val containerArgs = settingKey[Seq[String]]("The arguments to pass to the container when using docker run.")
 
-  val tag = SettingKey[String]("tag", "The full tag of the image. Constructed from the registry, name , and version. You should not need to override, but access to the value is provided for convenience.")
+/* Tasks */
 
-  val registry = SettingKey[String]("registry", "The docker registry to use for tag, push, and pull. Defaults to username.")
+  val build = taskKey[Unit]("Build a docker image.")
+
+  val login = taskKey[Unit]("Login into the docker index.")
+
+  val push = taskKey[Unit]("Push the docker image.")
+
+  val pull = taskKey[Unit]("Pull the docker image.")
+
+  val context = taskKey[File]("The context of the docker build.")
+
+  val runContainer = taskKey[Unit]("Run the docker image as a container.")
 }
 
 // vim: set ts=4 sw=4:
