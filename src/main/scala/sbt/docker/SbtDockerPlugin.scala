@@ -15,6 +15,7 @@ object SbtDockerPlugin extends Plugin {
     context in Docker <<= baseDirectory.map(identity),
     registry in Docker <<= (username in Docker)(identity),
     runArgs := Nil,
+    buildOpts in Docker := Seq("-q", "--rm"),
     containerArgs := Nil,
     tag in Docker <<= (registry in Docker, name in Docker, version in Docker) { (registry, name, version) =>
       val base = s"$name:$version"
@@ -24,8 +25,8 @@ object SbtDockerPlugin extends Plugin {
         base
       }
     },
-    build in Docker <<= (tag in Docker, context in Docker, streams) map { (tag, context, streams) =>
-      s"docker build -q --rm -t $tag $context" ! streams.log
+    build in Docker <<= (tag in Docker, buildOpts in Docker, context in Docker, streams) map { (tag, buildOpts, context, streams) =>
+      s"docker build ${buildOpts.mkString(" ")} -t $tag $context" ! streams.log
     },
     login in Docker <<= (username in Docker, password in Docker, email in Docker, streams) map { (u, p, e, streams) =>
       if (u.nonEmpty) {
