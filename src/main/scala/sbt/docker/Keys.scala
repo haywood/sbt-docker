@@ -23,6 +23,8 @@ object Keys {
 
   val containerArgs = settingKey[Seq[String]]("The arguments to pass to the container when using docker run.")
 
+  val buildOpts = settingKey[Seq[String]]("Options to pass to docker build. Does not include the tag option, which is always given.")
+
 /* Tasks */
 
   val build = taskKey[Unit]("Build a docker image.")
@@ -36,8 +38,6 @@ object Keys {
   val context = taskKey[File]("The context of the docker build.")
 
   val runContainer = taskKey[Unit]("Run the docker image as a container.")
-
-  val buildOpts = settingKey[Seq[String]]("Options to pass to docker build. Does not include the tag option, which is always given.")
 }
 
 // vim: set ts=4 sw=4:
